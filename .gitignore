@@ -174,3 +174,7 @@ xv6-psu-kernel/time.asm
 xv6-psu-kernel/time.d
 xv6-psu-kernel/time.o
 xv6-psu-kernel/time.sym
+Files ignored on Sun Apr 10 01:29:11 PDT 2016
+xv6-psu-kernel/LucidaSans-Typewriter83~
+xv6-psu-kernel/fmt/
+xv6-psu-kernel/xv6.pdf
