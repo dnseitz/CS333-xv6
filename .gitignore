@@ -162,3 +162,8 @@ xv6-psu-kernel/zombie.asm
 xv6-psu-kernel/zombie.d
 xv6-psu-kernel/zombie.o
 xv6-psu-kernel/zombie.sym
+xv6-psu-kernel/_date
+xv6-psu-kernel/date.asm
+xv6-psu-kernel/date.d
+xv6-psu-kernel/date.o
+xv6-psu-kernel/date.sym
