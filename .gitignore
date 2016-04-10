@@ -168,3 +168,9 @@ xv6-psu-kernel/zombie.asm
 xv6-psu-kernel/zombie.d
 xv6-psu-kernel/zombie.o
 xv6-psu-kernel/zombie.sym
+Files ignored on Sat Apr 9 23:36:16 PDT 2016
+xv6-psu-kernel/_time
+xv6-psu-kernel/time.asm
+xv6-psu-kernel/time.d
+xv6-psu-kernel/time.o
+xv6-psu-kernel/time.sym
