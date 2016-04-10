@@ -20,7 +20,7 @@ main(int argc, char *argv[])
 
   if (argc < 2)
   {
-    printf(2, "Usage: %s command [args...]", argv[0]);
+    printf(2, "Usage: %s command [args...]\n", argv[0]);
     exit();
   }
 
@@ -59,16 +59,16 @@ main(int argc, char *argv[])
       (start.day * DSECONDS) +
       (start.hour * HSECONDS) +
       (start.minute * MSECONDS) +
-      (start.seconds);
+      (start.second);
   end_sec = (end.year * YSECONDS) +
       (end.month * MOSECONDS) +
       (end.day * DSECONDS) +
       (end.hour * HSECONDS) +
       (end.minute * MSECONDS) +
-      (end.seconds);
+      (end.second);
   elapsed_sec = end_sec - start_sec;
 
   printf(2, "%s ran in %d minutes and %d seconds\n",
-            filename, (elapsed_sec/60), (elapsed_sec%60));
+            filename, ((int)elapsed_sec/60), ((int)elapsed_sec%60));
   exit();
 }

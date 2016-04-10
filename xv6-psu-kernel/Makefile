@@ -175,6 +175,7 @@ UPROGS=\
 	_zombie\
 	_halt\
   _date\
+  _time\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)
