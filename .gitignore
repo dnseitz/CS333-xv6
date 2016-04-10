@@ -1,4 +1,6 @@
+Files ignored on Sat Apr 9 20:21:17 PDT 2016
 xv6-psu-kernel/_cat
+xv6-psu-kernel/_date
 xv6-psu-kernel/_echo
 xv6-psu-kernel/_forktest
 xv6-psu-kernel/_grep
@@ -30,6 +32,10 @@ xv6-psu-kernel/cat.o
 xv6-psu-kernel/cat.sym
 xv6-psu-kernel/console.d
 xv6-psu-kernel/console.o
+xv6-psu-kernel/date.asm
+xv6-psu-kernel/date.d
+xv6-psu-kernel/date.o
+xv6-psu-kernel/date.sym
 xv6-psu-kernel/echo.asm
 xv6-psu-kernel/echo.d
 xv6-psu-kernel/echo.o
@@ -162,8 +168,3 @@ xv6-psu-kernel/zombie.asm
 xv6-psu-kernel/zombie.d
 xv6-psu-kernel/zombie.o
 xv6-psu-kernel/zombie.sym
-xv6-psu-kernel/_date
-xv6-psu-kernel/date.asm
-xv6-psu-kernel/date.d
-xv6-psu-kernel/date.o
-xv6-psu-kernel/date.sym
