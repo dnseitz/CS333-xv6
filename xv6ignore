@@ -4,11 +4,12 @@ GITDIR=~/CS333
 
 cd $(dirname $0)
 
-if [[ $(git status --porcelain) ]]; then
+if [[ $(git status --porcelain | grep '^??') ]]; then
   echo 'Files ignored on' `date` >> $GITDIR/.gitignore
   git status --porcelain | grep '^??' | cut -c4- >> $GITDIR/.gitignore
   echo 'auto-commiting changes to .gitignore'
-  git commit -am 'ignore untracked files generated from makefile'
+  git add $GITDIR/.gitignore
+  git commit -m 'ignore untracked files generated from makefile'
   echo 'Untracked files ignored'
 else
   echo 'no files to ignore'
