@@ -91,9 +91,23 @@ sys_uptime(void)
 }
 
 //Turn of the computer
-int sys_halt(void){
+int 
+sys_halt(void){
   cprintf("Shutting down ...\n");
   outw (0xB004, 0x0 | 0x2000);
   return 0;
 }
 
+// get the current date
+int
+sys_date(void)
+{
+  struct rtcdate *d;
+
+  if (argptr(0, (void*)&d, sizeof(*d)) < 0)
+  {
+    return -1;
+  }
+  cmostime(d);
+  return 0;
+}
