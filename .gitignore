@@ -15,22 +15,6 @@
 *.d
 *.asm
 *.sym
-*/vectors.S 
-*/bootblock 
-*/entryother
-*/initcode 
-*/initcode.out 
-*/kernel 
-*/xv6.img 
-*/fs.img 
-*/kernelmemfs 
-*/mkfs
-*/.gdbinit
-*/fmt 
-*/LucidaSans* 
-*/dist* 
-*/xv6.pdf
-*/xv6-pdx-kernel.tar.gz
 Files ignored on Mon Apr 11 21:11:32 PDT 2016
 xv6-psu-kernel/LucidaSans-Typewriter83~
 xv6-psu-kernel/_cat

@@ -13,7 +13,7 @@ main(int argc, char *argv[])
     exit();
   }
 
-  printf(2, "%d:%d:%d %d/%d/%d\n",
+  printf(1, "%d:%d:%d %d/%d/%d\n",
         r.hour, r.minute, r.second,
         r.month, r.day, r.year);
 

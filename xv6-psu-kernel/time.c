@@ -10,6 +10,17 @@
 #define HSECONDS 3600
 #define MSECONDS 60
 
+unsigned long long int
+rtcdate_to_sec(const struct rtcdate *r)
+{
+  return (r->year * YSECONDS) +
+      (r->month * MOSECONDS) +
+      (r->day * DSECONDS) +
+      (r->hour * HSECONDS) +
+      (r->minute * MSECONDS) +
+      (r->second);
+}
+
 int
 main(int argc, char *argv[]) 
 {
@@ -54,21 +65,11 @@ main(int argc, char *argv[])
     exit();
   }
 
-  start_sec = (start.year * YSECONDS) +
-      (start.month * MOSECONDS) +
-      (start.day * DSECONDS) +
-      (start.hour * HSECONDS) +
-      (start.minute * MSECONDS) +
-      (start.second);
-  end_sec = (end.year * YSECONDS) +
-      (end.month * MOSECONDS) +
-      (end.day * DSECONDS) +
-      (end.hour * HSECONDS) +
-      (end.minute * MSECONDS) +
-      (end.second);
+  start_sec = rtcdate_to_sec(&start);
+  end_sec = rtcdate_to_sec(&end);
   elapsed_sec = end_sec - start_sec;
 
-  printf(2, "%s ran in %d minutes and %d seconds\n",
+  printf(1, "%s ran in %d minutes and %d seconds\n",
             filename, ((int)elapsed_sec/60), ((int)elapsed_sec%60));
   exit();
 }
