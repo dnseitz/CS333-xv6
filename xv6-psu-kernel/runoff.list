@@ -79,3 +79,4 @@ bootmain.c
 # Daniel's files
 date.c
 time.c
+testuidgid.c
