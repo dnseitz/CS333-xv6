@@ -7,7 +7,7 @@
 #include "x86.h"
 #include "syscall.h"
 
-//#define DEBUG
+//#define PRINTSYSCALL
 
 // User code makes a system call with INT T_SYSCALL.
 // System call number in %eax.
@@ -129,7 +129,7 @@ static int (*syscalls[])(void) = {
 [SYS_date]    sys_date, //Added this in Project 2
 };
 
-#ifdef DEBUG
+#ifdef PRINTSYSCALL
   // Easy to access names for each syscall
   static char* syscallnames[] = {
   [SYS_fork]    "fork",
@@ -166,7 +166,7 @@ syscall(void)
   num = proc->tf->eax;
   if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
     proc->tf->eax = syscalls[num]();
-    #ifdef DEBUG
+    #ifdef PRINTSYSCALL
       // Print the syscall name and return code here
       printf(1, "%s -> %d\n", syscallnames[num], proc->tf->eax);
     #endif

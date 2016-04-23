@@ -32,6 +32,7 @@ trap.c
 syscall.h
 syscall.c
 sysproc.c
+halt.c
 
 # file system
 buf.h
