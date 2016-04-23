@@ -101,7 +101,14 @@ extern int sys_wait(void);
 extern int sys_write(void);
 extern int sys_uptime(void);
 extern int sys_halt(void);
+// Project 2
 extern int sys_date(void);
+// Project 3
+extern int sys_getuid(void);
+extern int sys_getgid(void);
+extern int sys_getppid(void);
+extern int sys_setuid(void);
+extern int sys_setgid(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -126,7 +133,14 @@ static int (*syscalls[])(void) = {
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
 [SYS_halt]    sys_halt,
-[SYS_date]    sys_date, //Added this in Project 2
+// Project 2
+[SYS_date]    sys_date, 
+// Project 3
+[SYS_getuid]  sys_getuid,
+[SYS_getgid]  sys_getgid,
+[SYS_getppid] sys_getppid,
+[SYS_setuid]  sys_setuid,
+[SYS_setgid]  sys_setgid,
 };
 
 #ifdef PRINTSYSCALL
@@ -154,7 +168,14 @@ static int (*syscalls[])(void) = {
   [SYS_mkdir]   "mkdir",
   [SYS_close]   "close",
   [SYS_halt]    "halt",
+  // Project 2
   [SYS_date]    "date",
+  // Project 3
+  [SYS_getuid]  "getuid",
+  [SYS_getgid]  "getgid",
+  [SYS_getppid] "getppid",
+  [SYS_setuid]  "setuid",
+  [SYS_setgid]  "setgid",
   };
 #endif
 

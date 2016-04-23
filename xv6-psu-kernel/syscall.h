@@ -21,4 +21,11 @@
 #define SYS_mkdir  20
 #define SYS_close  21
 #define SYS_halt   22
-#define SYS_date   23 //Added this in project 2
+// Project 2
+#define SYS_date   23 
+// Project 3
+#define SYS_getuid 24
+#define SYS_getgid 25
+#define SYS_getppid 26
+#define SYS_setuid 27
+#define SYS_setgid 28

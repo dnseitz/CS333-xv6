@@ -111,3 +111,52 @@ sys_date(void)
   cmostime(d);
   return 0;
 }
+
+// Below are project 3...
+
+// get the current process' uid
+int
+sys_getuid(void)
+{
+  return proc->uid;
+}
+
+// get the current process' gid
+int
+sys_getgid(void)
+{
+  return proc->gid;
+}
+
+// get the current process' parent's pid
+int
+sys_getppid(void)
+{
+  return proc->parent->pid;
+}
+
+// set the current process' uid
+int
+sys_setuid(void) 
+{
+  int uid;
+  if (argint(0, &uid) < 0) 
+  {
+    return -1;
+  }
+  proc->uid = uid;
+  return 0;
+}
+
+// set the current process' gid
+int
+sys_setgid(void)
+{
+  int gid;
+  if (argint(0, &gid) < 0) 
+  {
+    return -1;
+  }
+  proc->gid = gid;
+  return 0;
+}

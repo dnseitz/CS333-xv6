@@ -1,5 +1,7 @@
 // Segments in proc->gdt.
 #define NSEGS     7
+#define INIT_GID  0
+#define INIT_UID  0
 
 // Per-CPU state
 struct cpu {
@@ -66,6 +68,8 @@ struct proc {
   struct file *ofile[NOFILE];  // Open files
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
+  uint gid;                    // Group ID
+  uint uid;                    // User ID
 };
 
 // Process memory is laid out contiguously, low addresses first:

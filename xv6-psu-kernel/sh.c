@@ -1,4 +1,5 @@
 // Shell.
+// 2015-12-21. Added very simple processing for builtin commands
 
 #include "types.h"
 #include "user.h"
@@ -141,6 +142,94 @@ getcmd(char *buf, int nbuf)
   return 0;
 }
 
+// ***** processing for shell builtins begins here *****
+
+int
+strncmp(const char *p, const char *q, uint n)
+{
+    while(n > 0 && *p && *p == *q)
+      n--, p++, q++;
+    if(n == 0)
+      return 0;
+    return (uchar)*p - (uchar)*q;
+}
+
+int
+makeint(char *p)
+{
+  int val = 0;
+
+  while ((*p >= '0') && (*p <= '9')) {
+    val = 10*val + (*p-'0');
+    ++p;
+  }
+  return val;
+}
+
+int
+setbuiltin(char *p)
+{
+  int i;
+
+  p += strlen("_set");
+  while (strncmp(p, " ", 1) == 0) p++; // chomp spaces
+  if (strncmp("uid", p, 3) == 0) {
+    p += strlen("uid");
+    while (strncmp(p, " ", 1) == 0) p++; // chomp spaces
+    i = makeint(p); // ugly
+    return (setuid(i));
+  } else 
+  if (strncmp("gid", p, 3) == 0) {
+    p += strlen("gid");
+    while (strncmp(p, " ", 1) == 0) p++; // chomp spaces
+    i = makeint(p); // ugly
+    return (setgid(i));
+  }
+  printf(2, "Invalid _set parameter\n");
+  return -1;
+}
+
+int
+getbuiltin(char *p)
+{
+  p += strlen("_get");
+  while (strncmp(p, " ", 1) == 0) p++; // chomp spaces
+  if (strncmp("uid", p, 3) == 0) {
+    printf(2, "%d\n", getuid());
+    return 0;
+  }
+  if (strncmp("gid", p, 3) == 0) {
+    printf(2, "%d\n", getgid());
+    return 0;
+  }
+  printf(2, "Invalid _get parameter\n");
+  return -1;
+}
+
+typedef int funcPtr_t(char *);
+typedef struct {
+  char       *cmd;
+  funcPtr_t  *name;
+} dispatchTableEntry_t;
+
+// Use a simple function dispatch table (FDT) to process builtin commands
+dispatchTableEntry_t fdt[] = {
+  {"_set", setbuiltin},
+  {"_get", getbuiltin}
+};
+int FDTcount = sizeof(fdt) / sizeof(fdt[0]); // # entris in FDT
+
+void
+dobuiltin(char *cmd) {
+  int i;
+
+  for (i=0; i<FDTcount; i++) 
+    if (strncmp(cmd, fdt[i].cmd, strlen(fdt[i].cmd)) == 0) 
+     (*fdt[i].name)(cmd);
+}
+
+// ***** processing for shell builtins ends here *****
+
 int
 main(void)
 {
@@ -157,12 +246,17 @@ main(void)
   
   // Read and run input commands.
   while(getcmd(buf, sizeof(buf)) >= 0){
+// add support for built-ins here. cd is a built-in
     if(buf[0] == 'c' && buf[1] == 'd' && buf[2] == ' '){
       // Clumsy but will have to do for now.
       // Chdir has no effect on the parent if run in the child.
       buf[strlen(buf)-1] = 0;  // chop \n
       if(chdir(buf+3) < 0)
         printf(2, "cannot cd %s\n", buf+3);
+      continue;
+    }
+    if (buf[0]=='_') {     // assume it is a builtin command
+      dobuiltin(buf);
       continue;
     }
     if(fork1() == 0)
