@@ -468,3 +468,37 @@ procdump(void)
     cprintf("\n");
   }
 }
+
+/*
+int
+getprocs(int max, struct uproc * table)
+{
+  static char *states[] = {
+  [UNUSED]    "UNUSED",
+  [EMBRYO]    "EMBRYO",
+  [SLEEPING]  "SLEEPING",
+  [RUNNABLE]  "RUNNABLE",
+  [RUNNING]   "RUNNING",
+  [ZOMBIE]    "ZOMBIE"
+  };
+  struct proc * p;
+  int used = 0;
+  aquire(&ptable.lock);
+  for (p = ptable.proc; p != &ptable.proc[NPROC] && used < max; ++p)
+  {
+    if (p->state != UNUSED)
+    {
+      table[used].pid = p->pid;
+      table[used].uid = p->uid;
+      table[used].gid = p->gid;
+      table[used].ppid = p->parent->pid;
+      table[used].state = states[p->state];
+      table[used].sz = p->sz;
+      safestrcpy(table[used].name, p->name, sizeof(p->name));
+      ++used;
+    }
+  }
+  release(&ptable.lock);
+  return used;
+}
+*/
