@@ -78,10 +78,10 @@ struct uproc {
   uint uid;
   uint gid;
   int ppid;
-  char state;
+  char state[9];
   uint sz;
   char name[16];
-}
+};
 
 // Process memory is laid out contiguously, low addresses first:
 //   text

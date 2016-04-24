@@ -459,7 +459,7 @@ procdump(void)
       state = states[p->state];
     else
       state = "???";
-    cprintf("%d %s %s", p->pid, state, p->name);
+    cprintf("%d %s %s %d %d", p->pid, state, p->name, p->uid, p->gid);
     if(p->state == SLEEPING){
       getcallerpcs((uint*)p->context->ebp+2, pc);
       for(i=0; i<10 && pc[i] != 0; i++)
@@ -469,7 +469,6 @@ procdump(void)
   }
 }
 
-/*
 int
 getprocs(int max, struct uproc * table)
 {
@@ -481,9 +480,13 @@ getprocs(int max, struct uproc * table)
   [RUNNING]   "RUNNING",
   [ZOMBIE]    "ZOMBIE"
   };
+  if (max < 0)
+  {
+    return -1;
+  }
   struct proc * p;
   int used = 0;
-  aquire(&ptable.lock);
+  acquire(&ptable.lock);
   for (p = ptable.proc; p != &ptable.proc[NPROC] && used < max; ++p)
   {
     if (p->state != UNUSED)
@@ -492,7 +495,7 @@ getprocs(int max, struct uproc * table)
       table[used].uid = p->uid;
       table[used].gid = p->gid;
       table[used].ppid = p->parent->pid;
-      table[used].state = states[p->state];
+      safestrcpy(table[used].state, states[p->state], 9/*longest state name*/);
       table[used].sz = p->sz;
       safestrcpy(table[used].name, p->name, sizeof(p->name));
       ++used;
@@ -501,4 +504,3 @@ getprocs(int max, struct uproc * table)
   release(&ptable.lock);
   return used;
 }
-*/

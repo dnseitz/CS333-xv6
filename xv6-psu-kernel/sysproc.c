@@ -161,7 +161,6 @@ sys_setgid(void)
   return 0;
 }
 
-/*
 int
 sys_getprocs(void)
 {
@@ -177,4 +176,3 @@ sys_getprocs(void)
   }
   return getprocs(max, table);
 }
-*/

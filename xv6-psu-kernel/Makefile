@@ -177,6 +177,7 @@ UPROGS=\
   _date\
   _time\
 	_testuidgid\
+	_ps\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)
