@@ -46,3 +46,6 @@ xv6-psu-kernel/initcode.out
 xv6-psu-kernel/kernel
 xv6-psu-kernel/vectors.S
 xv6-psu-kernel/xv6.img
+Files ignored on Sun Apr 24 08:47:23 PDT 2016
+xv6-psu-kernel/_ps
+xv6-psu-kernel/_testuidgid
