@@ -49,3 +49,5 @@ xv6-psu-kernel/xv6.img
 Files ignored on Sun Apr 24 08:47:23 PDT 2016
 xv6-psu-kernel/_ps
 xv6-psu-kernel/_testuidgid
+Files ignored on Mon May 2 22:46:03 PDT 2016
+xv6-psu-kernel/_testps
