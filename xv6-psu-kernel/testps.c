@@ -4,11 +4,37 @@
 
 #define MAX 64
 
-int
-main(int argc, char *argv[]) 
+int 
+main(int argc, char * argv[]) 
 {
   struct uproc procs[MAX];
-  int i, filled;
+  int i, filled, pid, children = 0, is_child = 0;
+
+  for (i = 0; i < 7; ++i)
+  {
+    pid = fork();
+    if (pid > 0)
+    {
+      ++children;
+    }
+    else if (pid == 0)
+    {
+      is_child = 1;
+    }
+    else 
+    {
+      break;
+    }
+  }
+  if (is_child)
+  {
+    for (i = 0; i < children; ++i)
+    {
+      wait();
+    }
+    exit();
+  }
+
   if ((filled = getprocs(MAX, procs)) < 0) 
   {
     printf(2, "getprocs failed");
@@ -26,6 +52,11 @@ main(int argc, char *argv[])
                                       procs[i].sz,
                                       procs[i].name);
   }
+
+  for (i = 0; i < children; ++i)
+  {
+    wait();
+  } 
 
   exit();
 }

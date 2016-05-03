@@ -6,6 +6,7 @@
 #include "x86.h"
 #include "proc.h"
 #include "spinlock.h"
+#include "uproc.h"
 
 struct {
   struct spinlock lock;
@@ -98,6 +99,7 @@ userinit(void)
 
   safestrcpy(p->name, "initcode", sizeof(p->name));
   p->cwd = namei("/");
+  p->parent = p; // parent of the first process is itself
   p->gid = INIT_GID;
   p->uid = INIT_UID;
 
@@ -473,12 +475,12 @@ int
 getprocs(int max, struct uproc * table)
 {
   static char *states[] = {
-  [UNUSED]    "UNUSED",
-  [EMBRYO]    "EMBRYO",
+  [UNUSED]    "UNUSED  ",
+  [EMBRYO]    "EMBRYO  ",
   [SLEEPING]  "SLEEPING",
   [RUNNABLE]  "RUNNABLE",
-  [RUNNING]   "RUNNING",
-  [ZOMBIE]    "ZOMBIE"
+  [RUNNING]   "RUNNING ",
+  [ZOMBIE]    "ZOMBIE  "
   };
   if (max < 0)
   {
@@ -489,7 +491,7 @@ getprocs(int max, struct uproc * table)
   acquire(&ptable.lock);
   for (p = ptable.proc; p != &ptable.proc[NPROC] && used < max; ++p)
   {
-    if (p->state != UNUSED)
+    if (p->state != UNUSED && p->state != EMBRYO)
     {
       table[used].pid = p->pid;
       table[used].uid = p->uid;

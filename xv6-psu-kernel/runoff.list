@@ -80,3 +80,4 @@ bootmain.c
 date.c
 time.c
 testuidgid.c
+ps.c

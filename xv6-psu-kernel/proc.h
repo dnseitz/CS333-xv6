@@ -72,16 +72,6 @@ struct proc {
   uint uid;                    // User ID
 };
 
-// Skimmed down per-process state
-struct uproc {
-  int pid;
-  uint uid;
-  uint gid;
-  int ppid;
-  char state[9];
-  uint sz;
-  char name[16];
-};
 
 // Process memory is laid out contiguously, low addresses first:
 //   text
