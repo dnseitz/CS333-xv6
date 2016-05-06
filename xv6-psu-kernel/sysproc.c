@@ -105,15 +105,14 @@ sys_date(void)
 {
   struct rtcdate *d;
 
-  if (argptr(0, (void*)&d, sizeof(*d)) < 0)
-  {
+  if (argptr(0, (void*)&d, sizeof(*d)) < 0) {
     return -1;
   }
   cmostime(d);
   return 0;
 }
 
-// Below are project 3...
+// Below is project 3...
 
 // get the current process' uid
 int
@@ -141,8 +140,7 @@ int
 sys_setuid(void) 
 {
   int uid;
-  if (argint(0, &uid) < 0) 
-  {
+  if (argint(0, &uid) < 0) {
     return -1;
   }
   proc->uid = uid;
@@ -154,25 +152,23 @@ int
 sys_setgid(void)
 {
   int gid;
-  if (argint(0, &gid) < 0) 
-  {
+  if (argint(0, &gid) < 0) {
     return -1;
   }
   proc->gid = gid;
   return 0;
 }
 
+// fill in a table of uproc structs
 int
 sys_getprocs(void)
 {
   int max;
   struct uproc * table;
-  if (argint(0, &max) < 0)
-  {
+  if (argint(0, &max) < 0) {
     return -1;
   }
-  if (argptr(1, (void*)&table, sizeof(*table)) < 0)
-  {
+  if (argptr(1, (void*)&table, sizeof(*table)) < 0) {
     return -1;
   }
   return getprocs(max, table);

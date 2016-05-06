@@ -99,6 +99,7 @@ userinit(void)
 
   safestrcpy(p->name, "initcode", sizeof(p->name));
   p->cwd = namei("/");
+  // Added in project 3, initialize parent, uid and gid
   p->parent = p; // parent of the first process is itself
   p->gid = INIT_GID;
   p->uid = INIT_UID;
@@ -161,6 +162,7 @@ fork(void)
   safestrcpy(np->name, proc->name, sizeof(proc->name));
  
   pid = np->pid;
+  // Added in Project 3, copy over gid and uid from parent process
   np->gid = proc->gid;
   np->uid = proc->uid;
 
@@ -482,17 +484,14 @@ getprocs(int max, struct uproc * table)
   [RUNNING]   "RUNNING ",
   [ZOMBIE]    "ZOMBIE  "
   };
-  if (max < 0)
-  {
+  if (max < 0) {
     return -1;
   }
   struct proc * p;
   int used = 0;
   acquire(&ptable.lock);
-  for (p = ptable.proc; p != &ptable.proc[NPROC] && used < max; ++p)
-  {
-    if (p->state != UNUSED && p->state != EMBRYO)
-    {
+  for (p = ptable.proc; p != &ptable.proc[NPROC] && used < max; ++p) {
+    if (p->state != UNUSED && p->state != EMBRYO) {
       table[used].pid = p->pid;
       table[used].uid = p->uid;
       table[used].gid = p->gid;

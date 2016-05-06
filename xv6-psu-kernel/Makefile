@@ -179,6 +179,7 @@ UPROGS=\
 	_testuidgid\
 	_ps\
 	_testps\
+	_breakgetprocs\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)

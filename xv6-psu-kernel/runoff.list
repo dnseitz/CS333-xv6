@@ -77,7 +77,12 @@ bootasm.S
 bootmain.c
 
 # Daniel's files
+# Project 2
 date.c
 time.c
+# Project 3
 testuidgid.c
 ps.c
+testps.c
+breakgetprocs.c
+uproc.h

@@ -35,6 +35,8 @@ main(int argc, char * argv[])
     exit();
   }
 
+  // Code below here is essentially ps.c verbatim, but I can't exec over this 
+  // process without losing track of the children... think of the children!
   if ((filled = getprocs(MAX, procs)) < 0) 
   {
     printf(2, "getprocs failed");
@@ -53,6 +55,7 @@ main(int argc, char * argv[])
                                       procs[i].name);
   }
 
+  // Now reap the child processes
   for (i = 0; i < children; ++i)
   {
     wait();
