@@ -51,3 +51,11 @@ xv6-psu-kernel/_ps
 xv6-psu-kernel/_testuidgid
 Files ignored on Mon May 2 22:46:03 PDT 2016
 xv6-psu-kernel/_testps
+Files ignored on Fri May 6 11:17:29 PDT 2016
+xv6-psu-kernel/.breakgetprocs.asm.swp
+xv6-psu-kernel/.breakgetprocs.c.swp
+xv6-psu-kernel/.gdbinit
+xv6-psu-kernel/_breakgetprocs
+xv6-psu-kernel/dist-test/
+xv6-psu-kernel/dist/
+xv6-psu-kernel/x.ps
