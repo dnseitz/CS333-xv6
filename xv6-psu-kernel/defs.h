@@ -112,6 +112,7 @@ int             growproc(int);
 int             kill(int);
 void            pinit(void);
 void            procdump(void);
+void            scheddump(void); // Project 4
 void            scheduler(void) __attribute__((noreturn));
 void            sched(void);
 void            sleep(void*, struct spinlock*);
@@ -119,7 +120,8 @@ void            userinit(void);
 int             wait(void);
 void            wakeup(void*);
 void            yield(void);
-int             getprocs(int, struct uproc*);
+int             getprocs(int, struct uproc*); // Project 3
+int             setpriority(int, int); // Project 4
 
 // swtch.S
 void            swtch(struct context**, struct context*);

@@ -173,3 +173,16 @@ sys_getprocs(void)
   }
   return getprocs(max, table);
 }
+
+int
+sys_setpriority(void)
+{
+  int pid, priority;
+  if(argint(0, &pid) < 0) {
+    return -1;
+  }
+  if(argint(1, &priority) < 0) {
+    return -1;
+  }
+  return setpriority(pid, priority);
+}

@@ -11,6 +11,11 @@
 struct {
   struct spinlock lock;
   struct proc proc[NPROC];
+  // Added in project 4
+  struct proc *pready[3]; // Set up as circular LL
+  struct proc *pfree;     // Set up as circular LL
+  uint resetcounter;      // Number of times a scheduler is allowed to run before
+                          // resetting priorities
 } ptable;
 
 static struct proc *initproc;
@@ -27,6 +32,55 @@ pinit(void)
   initlock(&ptable.lock, "ptable");
 }
 
+// push a process onto the back of a process list
+// ptable lock should be held by caller
+void
+push(struct proc** list, struct proc* p) 
+{
+  if(!(*list)) {
+    (*list) = p;
+    p->next = p;
+  } else {
+    p->next = (*list)->next;
+    (*list)->next = p;
+    (*list) = p;
+  }
+}
+
+// pop a process off of the front of a process list
+// ptable lock should be held by caller
+struct proc*
+pop(struct proc** list) 
+{
+  struct proc *p;
+  if(!(*list)) {
+    return NULL;
+  }
+
+  p = (*list)->next;
+  if(p == (*list)) {
+    (*list) = NULL;
+  } else {
+    (*list)->next = p->next;
+  }
+  return p;
+}
+
+void
+printlist(struct proc* list) 
+{
+  struct proc *p;
+  if(list == NULL) {
+    return;
+  }
+  p = list->next;
+  do {
+    cprintf("pid: %d  ->  ", p->pid);
+    p = p->next;
+  } while(p != list->next);
+  cprintf("\n");
+}
+
 //PAGEBREAK: 32
 // Look in the process table for an UNUSED proc.
 // If found, change state to EMBRYO and initialize
@@ -39,13 +93,14 @@ allocproc(void)
   char *sp;
 
   acquire(&ptable.lock);
-  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
-    if(p->state == UNUSED)
-      goto found;
-  release(&ptable.lock);
-  return 0;
+  if(!(p = pop(&ptable.pfree))) {
+    release(&ptable.lock);
+    return 0;
+  }
+  if(p->state != UNUSED) {
+    panic("allocproc: used process in free list");
+  }
 
-found:
   p->state = EMBRYO;
   p->pid = nextpid++;
   release(&ptable.lock);
@@ -53,6 +108,9 @@ found:
   // Allocate kernel stack.
   if((p->kstack = kalloc()) == 0){
     p->state = UNUSED;
+    acquire(&ptable.lock);
+    push(&ptable.pfree, p);
+    release(&ptable.lock);
     return 0;
   }
   sp = p->kstack + KSTACKSIZE;
@@ -80,8 +138,34 @@ void
 userinit(void)
 {
   struct proc *p;
+  int i;
   extern char _binary_initcode_start[], _binary_initcode_size[];
-  
+
+  //acquire(&ptable.lock);
+  // Initialize ready and free lists
+  ptable.resetcounter = MAX_TIME_TO_RESET;
+  ptable.pfree = NULL;
+  for(i = HIGH; i <= LOW; ++i) {
+    ptable.pready[i] = NULL;
+  }
+  // Setup the free list
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; ++p) {
+    if (p->state != UNUSED) {
+      panic("userinit: process allocated already?");
+    }
+    push(&ptable.pfree, p);
+  }
+  //release(&ptable.lock);
+  /* // Make sure all processes are in free list
+  p = ptable.pfree;
+  int i = 0;
+  do {
+    cprintf("proc num in free list: %d\n", i);
+    ++i;
+    p = p->next;
+  } while(p != ptable.pfree);
+  cprintf("userinit called\n"); //Checking to see how many times userinit is called
+  */
   p = allocproc();
   initproc = p;
   if((p->pgdir = setupkvm()) == 0)
@@ -105,6 +189,10 @@ userinit(void)
   p->uid = INIT_UID;
 
   p->state = RUNNABLE;
+  p->priority = DEFAULT;
+  //acquire(&ptable.lock); //This neccessary? Will there ever be more than one cpu running on init?
+  push(&ptable.pready[HIGH], p); //Put into high priority queue because this should be the only process running
+  //release(&ptable.lock);
 }
 
 // Grow current process's memory by n bytes.
@@ -145,6 +233,9 @@ fork(void)
     kfree(np->kstack);
     np->kstack = 0;
     np->state = UNUSED;
+    acquire(&ptable.lock);
+    push(&ptable.pfree, np); // Project 4
+    acquire(&ptable.lock);
     return -1;
   }
   np->sz = proc->sz;
@@ -169,6 +260,8 @@ fork(void)
   // lock to force the compiler to emit the np->state write last.
   acquire(&ptable.lock);
   np->state = RUNNABLE;
+  np->priority = DEFAULT;
+  push(&ptable.pready[DEFAULT], np); // Project 4: Add to default priority queue
   release(&ptable.lock);
   
   return pid;
@@ -246,6 +339,7 @@ wait(void)
         p->parent = 0;
         p->name[0] = 0;
         p->killed = 0;
+        push(&ptable.pfree, p); // Project 4: add this process back to the free list
         release(&ptable.lock);
         return pid;
       }
@@ -274,6 +368,7 @@ void
 scheduler(void)
 {
   struct proc *p;
+  int priority; // Priority of ready queue 0=high, 1=default, 2=low
 
   for(;;){
     // Enable interrupts on this processor.
@@ -281,6 +376,37 @@ scheduler(void)
 
     // Loop over process table looking for process to run.
     acquire(&ptable.lock);
+    for(priority = HIGH; priority <= LOW; ++priority) {
+      if(!(p = pop(&ptable.pready[priority]))) {
+        continue;
+      }
+      if(p->state != RUNNABLE) {
+        panic("scheduler: non-runnable process in ready list");
+      }
+
+      // Switch to chosen process.  It is the process's job
+      // to release ptable.lock and then reacquire it
+      // before jumping back to us.
+      proc = p;
+      switchuvm(p);
+      p->state = RUNNING;
+      swtch(&cpu->scheduler, proc->context);
+      switchkvm();
+      if (--ptable.resetcounter == 0) {
+        for(p = ptable.proc; p < &ptable.proc[NPROC]; ++p) {
+          if(p->state != RUNNABLE && p->state != SLEEPING && p->state != RUNNING) {
+            continue;
+          }
+          p->priority = DEFAULT;
+        }
+        ptable.resetcounter = MAX_TIME_TO_RESET; 
+      }
+
+      // Process is done running for now.
+      // It should have changed its p->state before coming back.
+      proc = 0;
+    }
+    /* OLD SCHEDULER
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
       if(p->state != RUNNABLE)
         continue;
@@ -298,6 +424,7 @@ scheduler(void)
       // It should have changed its p->state before coming back.
       proc = 0;
     }
+    */
     release(&ptable.lock);
 
   }
@@ -329,6 +456,7 @@ yield(void)
 {
   acquire(&ptable.lock);  //DOC: yieldlock
   proc->state = RUNNABLE;
+  push(&ptable.pready[proc->priority], proc);
   sched();
   release(&ptable.lock);
 }
@@ -399,9 +527,12 @@ wakeup1(void *chan)
 {
   struct proc *p;
 
-  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
-    if(p->state == SLEEPING && p->chan == chan)
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
+    if(p->state == SLEEPING && p->chan == chan) {
       p->state = RUNNABLE;
+      push(&ptable.pready[p->priority], p);
+    }
+  }
 }
 
 // Wake up all processes sleeping on chan.
@@ -426,8 +557,10 @@ kill(int pid)
     if(p->pid == pid){
       p->killed = 1;
       // Wake process from sleep if necessary.
-      if(p->state == SLEEPING)
+      if(p->state == SLEEPING) {
         p->state = RUNNABLE;
+        push(&ptable.pready[p->priority], p);
+      }
       release(&ptable.lock);
       return 0;
     }
@@ -463,7 +596,7 @@ procdump(void)
       state = states[p->state];
     else
       state = "???";
-    cprintf("%d %s %s %d %d", p->pid, state, p->name, p->uid, p->gid);
+    cprintf("%d %s %s %d %d %d", p->pid, state, p->name, p->priority, p->uid, p->gid);
     if(p->state == SLEEPING){
       getcallerpcs((uint*)p->context->ebp+2, pc);
       for(i=0; i<10 && pc[i] != 0; i++)
@@ -473,6 +606,30 @@ procdump(void)
   }
 }
 
+void
+scheddump(void)
+{
+  int i;
+  static char *priorities[] = {
+    [HIGH]    "High   ",
+    [DEFAULT] "Default",
+    [LOW]     "Low    "
+  };
+  acquire(&ptable.lock);
+  cprintf("Free list:  ");
+  printlist(ptable.pfree);
+  cprintf("\n");
+  for(i = HIGH; i <= LOW; ++i) {
+    cprintf("%s priority list: ", priorities[i]);
+    printlist(ptable.pready[i]);
+    cprintf("\n");
+  }
+  release(&ptable.lock);
+}
+
+// Fill in a table of uprocs with process information
+// Returns the number of processes filled in on success
+// ERR CODES: -1 = max value was negative
 int
 getprocs(int max, struct uproc * table)
 {
@@ -499,9 +656,34 @@ getprocs(int max, struct uproc * table)
       safestrcpy(table[used].state, states[p->state], 9/*longest state name*/);
       table[used].sz = p->sz;
       safestrcpy(table[used].name, p->name, sizeof(p->name));
+      table[used].priority = p->priority;
       ++used;
     }
   }
   release(&ptable.lock);
   return used;
+}
+
+// Set the priority of a process
+// Added in Project 4
+// Returns 0 on success
+// ERR CODES: -1 = priority out of range
+//            -2 = pid not found
+int
+setpriority(int pid, int priority) 
+{
+  struct proc *p;
+  if(priority < HIGH || priority > LOW) {
+    return -1;
+  }
+  acquire(&ptable.lock);
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; ++p) {
+    if(p->pid == pid) {
+      p->priority = priority;
+      release(&ptable.lock);
+      return 0;
+    }
+  }
+  release(&ptable.lock);
+  return -2;
 }

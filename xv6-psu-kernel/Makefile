@@ -180,6 +180,7 @@ UPROGS=\
 	_ps\
 	_testps\
 	_breakgetprocs\
+	_testsched\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)

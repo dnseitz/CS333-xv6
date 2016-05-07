@@ -189,7 +189,7 @@ struct {
 void
 consoleintr(int (*getc)(void))
 {
-  int c, doprocdump = 0;
+  int c, doprocdump = 0, doscheddump = 0;
 
   acquire(&cons.lock);
   while((c = getc()) >= 0){
@@ -210,6 +210,9 @@ consoleintr(int (*getc)(void))
         consputc(BACKSPACE);
       }
       break;
+    case C('S'): // Print scheduler data.
+      doscheddump = 1;  // for same reason as procdump()
+      break;
     default:
       if(c != 0 && input.e-input.r < INPUT_BUF){
         c = (c == '\r') ? '\n' : c;
@@ -226,6 +229,9 @@ consoleintr(int (*getc)(void))
   release(&cons.lock);
   if(doprocdump) {
     procdump();  // now call procdump() wo. cons.lock held
+  }
+  if(doscheddump) {
+    scheddump();
   }
 }
 

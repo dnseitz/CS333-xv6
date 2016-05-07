@@ -18,15 +18,16 @@ main(int argc, char *argv[])
     exit();
   }
   
-  printf(1, "pid uid gid ppid state size name\n");
+  printf(1, "pid uid gid ppid state size name priority\n");
   for (i = 0; i < filled; ++i) {
-    printf(1, "%d  %d  %d  %d  %s  %d  %s\n", procs[i].pid,
+    printf(1, "%d  %d  %d  %d  %s  %d  %s %d\n", procs[i].pid,
                                       procs[i].uid,
                                       procs[i].gid,
                                       procs[i].ppid,
                                       procs[i].state,
                                       procs[i].sz,
-                                      procs[i].name);
+                                      procs[i].name,
+                                      procs[i].priority);
   }
   exit();
 }

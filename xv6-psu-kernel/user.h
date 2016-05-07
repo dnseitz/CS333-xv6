@@ -34,6 +34,8 @@ int getppid();
 int setuid(uint);
 int setgid(uint);
 int getprocs(int, struct uproc*);
+// Project 3
+int setpriority(int, int);
 
 // ulib.c
 int stat(char*, struct stat*);

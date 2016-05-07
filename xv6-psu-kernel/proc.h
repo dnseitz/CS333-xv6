@@ -2,6 +2,7 @@
 #define NSEGS     7
 #define INIT_GID  0
 #define INIT_UID  0
+#define MAX_TIME_TO_RESET 1000
 
 // Per-CPU state
 struct cpu {
@@ -52,6 +53,7 @@ struct context {
 };
 
 enum procstate { UNUSED, EMBRYO, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
+enum priority { HIGH, DEFAULT, LOW };
 
 // Per-process state
 struct proc {
@@ -70,6 +72,8 @@ struct proc {
   char name[16];               // Process name (debugging)
   uint gid;                    // Group ID
   uint uid;                    // User ID
+  struct proc * next;          // Next proc in the ready or free list
+  enum priority priority;      // Priority of the process
 };
 
 
