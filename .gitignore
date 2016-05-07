@@ -18,7 +18,7 @@
 *.pdf
 *mkfs
 *entryother
-#Files ignored on Mon Apr 11 21:11:32 PDT 2016
+# Files ignored on Mon Apr 11 21:11:32 PDT 2016
 xv6-psu-kernel/LucidaSans-Typewriter83~
 xv6-psu-kernel/_cat
 xv6-psu-kernel/_date
@@ -46,12 +46,12 @@ xv6-psu-kernel/initcode.out
 xv6-psu-kernel/kernel
 xv6-psu-kernel/vectors.S
 xv6-psu-kernel/xv6.img
-#Files ignored on Sun Apr 24 08:47:23 PDT 2016
+# Files ignored on Sun Apr 24 08:47:23 PDT 2016
 xv6-psu-kernel/_ps
 xv6-psu-kernel/_testuidgid
-#Files ignored on Mon May 2 22:46:03 PDT 2016
+# Files ignored on Mon May 2 22:46:03 PDT 2016
 xv6-psu-kernel/_testps
-#Files ignored on Fri May 6 11:17:29 PDT 2016
+# Files ignored on Fri May 6 11:17:29 PDT 2016
 xv6-psu-kernel/.breakgetprocs.asm.swp
 xv6-psu-kernel/.breakgetprocs.c.swp
 xv6-psu-kernel/.gdbinit
@@ -59,7 +59,7 @@ xv6-psu-kernel/_breakgetprocs
 xv6-psu-kernel/dist-test/
 xv6-psu-kernel/dist/
 xv6-psu-kernel/x.ps
-#Files ignored on Sat May 7 09:48:52 PDT 2016
+# Files ignored on Sat May 7 09:48:52 PDT 2016
 xv6-psu-kernel/xv6-pdx-kernel.tar.gz
 # Files ignored on Sat May 7 15:36:37 PDT 2016
 xv6-psu-kernel/_testsched

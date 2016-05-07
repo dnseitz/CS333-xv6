@@ -5,7 +5,7 @@ GITDIR=~/CS333
 cd $(dirname $0)
 
 if [[ $(git status --porcelain | grep '^??') ]]; then
-  echo 'Files ignored on' `date` >> $GITDIR/.gitignore
+  echo '# Files ignored on' `date` >> $GITDIR/.gitignore
   git status --porcelain | grep '^??' | cut -c4- >> $GITDIR/.gitignore
   echo 'auto-commiting changes to .gitignore'
   git add $GITDIR/.gitignore
