@@ -63,3 +63,7 @@ xv6-psu-kernel/x.ps
 xv6-psu-kernel/xv6-pdx-kernel.tar.gz
 # Files ignored on Sat May 7 15:36:37 PDT 2016
 xv6-psu-kernel/_testsched
+# Files ignored on Thu May 12 16:24:14 PDT 2016
+xv6-psu-kernel/_mytestsched
+xv6-psu-kernel/_testSched
+xv6-psu-kernel/_testpriority
