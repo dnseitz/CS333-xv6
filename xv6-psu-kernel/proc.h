@@ -2,7 +2,7 @@
 #define NSEGS     7
 #define INIT_GID  0
 #define INIT_UID  0
-#define MAX_TIME_TO_RESET 1000
+#define MAX_TIME_TO_RESET 50000
 
 // Per-CPU state
 struct cpu {
