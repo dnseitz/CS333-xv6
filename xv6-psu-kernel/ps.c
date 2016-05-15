@@ -13,6 +13,8 @@ main(int argc, char *argv[])
     max = atoi(argv[1]);
   }
 
+  setpriority(getpid(), 0); //Make this a high priority process
+
   if ((filled = getprocs(max, procs)) < 0) {
     printf(2, "getprocs failed");
     exit();

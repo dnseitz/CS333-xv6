@@ -14,10 +14,13 @@ main(int argc, char *argv[])
     if(pid == 0) {
       for(;;);
     } else {
-      if(pid > 0) {
-        setpriority(pid, 2);
-      }
       children[i] = pid;
+    }
+  }
+
+  for(i = 0; i < MAX; ++i) {
+    if(children[i] > 0) {
+      setpriority(children[i], 0);
     }
   }
   

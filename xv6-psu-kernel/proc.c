@@ -38,8 +38,8 @@ void
 queue(struct proc** list, struct proc* p) 
 {
   if(!(*list)) {
-    (*list) = p;
     p->next = p;
+    (*list) = p;
   } else {
     p->next = (*list)->next;
     (*list)->next = p;
@@ -98,12 +98,14 @@ void
 printlist(struct proc* list) 
 {
   struct proc *p;
+  cprintf("<head>");
   if(list == NULL) {
+    cprintf("  ->  <null>");
     return;
   }
   p = list->next;
   do {
-    cprintf("pid: %d  ->  ", p->pid);
+    cprintf("  ->  pid: %d", p->pid);
     p = p->next;
   } while(p != list->next);
   cprintf("\n");
@@ -170,8 +172,9 @@ userinit(void)
   extern char _binary_initcode_start[], _binary_initcode_size[];
 
   // Initialize ready and free lists, no need to lock ptable since
-  // we should be the only thing running
+  // we should be the only thing looking at it right now
   ptable.resetcounter = MAX_TIME_TO_RESET;
+  // List pointers should already be initialized to 0, but just in case
   ptable.pfree = NULL;
   for(i = HIGH; i <= LOW; ++i) {
     ptable.pready[i] = NULL;
@@ -217,8 +220,11 @@ userinit(void)
 
   p->state = RUNNABLE;
   // Project 4:
-  // Put into high priority queue because this should be the only process running
-  // there should be no need for a lock since only init should be running
+  // Put into high priority queue because this should be the only process running 
+  // (it will get requeued at default priority level) there should be no need for 
+  // a lock since only init will be adding to the list (it's safe to add if there's
+  // nothing on the list even if another cpu is trying to dequeue, as long as this
+  // is the only thing trying to queue)
   p->priority = DEFAULT;
   queue(&ptable.pready[HIGH], p); 
 }
@@ -423,39 +429,44 @@ scheduler(void)
       proc = 0;
     }
 #else
-    for(priority = HIGH; priority <= LOW; ++priority) {
-      if(!(p = dequeue(&ptable.pready[priority]))) {
-        continue;
+    for(priority = HIGH;;priority=(priority+1)%3) {
+      if((p = dequeue(&ptable.pready[priority]))) {
+        break;
       }
-      if(p->state != RUNNABLE) {
-        panic("scheduler: non-runnable process in ready list");
+      if(priority==LOW) {
+        // Give another cpu a chance if we don't find any processes
+        release(&ptable.lock);
+        acquire(&ptable.lock);
       }
-
-      // Switch to chosen process.  It is the process's job
-      // to release ptable.lock and then reacquire it
-      // before jumping back to us.
-      proc = p;
-      switchuvm(p);
-      p->state = RUNNING;
-      swtch(&cpu->scheduler, proc->context);
-      switchkvm();
-      if (--ptable.resetcounter == 0) {
-  #ifdef DEBUGSCHED
-        cprintf("ptable.resetcounter hit 0\n");
-  #endif
-        for(p = ptable.proc; p < &ptable.proc[NPROC]; ++p) {
-          if(p->state != RUNNABLE && p->state != SLEEPING && p->state != RUNNING) {
-            continue;
-          }
-          p->priority = DEFAULT;
-        }
-        ptable.resetcounter = MAX_TIME_TO_RESET; 
-      }
-
-      // Process is done running for now.
-      // It should have changed its p->state before coming back.
-      proc = 0;
     }
+    if(p->state != RUNNABLE) {
+      panic("scheduler: non-runnable process in ready list");
+    }
+
+    // Switch to chosen process.  It is the process's job
+    // to release ptable.lock and then reacquire it
+    // before jumping back to us.
+    proc = p;
+    switchuvm(p);
+    p->state = RUNNING;
+    swtch(&cpu->scheduler, proc->context);
+    switchkvm();
+    if (--ptable.resetcounter == 0) {
+  #ifdef DEBUGSCHED
+      cprintf("ptable.resetcounter hit 0\n");
+  #endif
+      for(p = ptable.proc; p < &ptable.proc[NPROC]; ++p) {
+        if(p->state != RUNNABLE && p->state != SLEEPING && p->state != RUNNING) {
+          continue;
+        }
+        p->priority = DEFAULT;
+      }
+      ptable.resetcounter = MAX_TIME_TO_RESET; 
+    }
+
+    // Process is done running for now.
+    // It should have changed its p->state before coming back.
+    proc = 0;
 #endif
     release(&ptable.lock);
 
